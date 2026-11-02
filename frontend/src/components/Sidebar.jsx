@@ -24,7 +24,7 @@ export default function Sidebar({ open, onClose }) {
 
   const menu = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-    { label: "Patients", icon: Users, disabled: true },
+    { label: "Patients", icon: Users, path: "/patients" },
     { label: "Appointments", icon: CalendarDays, disabled: true },
     { label: "Doctors", icon: Stethoscope, disabled: true },
     { label: "Visit Records", icon: ClipboardList, disabled: true },
@@ -56,7 +56,11 @@ export default function Sidebar({ open, onClose }) {
             <span>Management Portal</span>
           </div>
 
-          <button className="mobile-close" onClick={onClose}>
+          <button
+            className="mobile-close"
+            onClick={onClose}
+            aria-label="Close menu"
+          >
             <X size={20} />
           </button>
         </div>

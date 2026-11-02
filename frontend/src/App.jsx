@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Patients from "./pages/Patients";
 import Settings from "./pages/Settings";
 import DashboardLayout from "./layouts/DashboardLayout";
 
@@ -32,6 +33,7 @@ export default function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/patients" element={<Patients />} />
 
         <Route element={<AdminRoute />}>
           <Route path="/settings" element={<Settings />} />
