@@ -9,6 +9,8 @@ const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
 const Patients = lazy(() => import("./pages/Patients/Patients"));
 const Doctors = lazy(() => import("./pages/Doctors/Doctors"));
 const Settings = lazy(() => import("./pages/Settings/Settings"));
+const Appointments = lazy(() => import("./pages/Appointments/Appointments"));
+const WhatsApp = lazy(() => import("./pages/WhatsApp/WhatsApp"));
 
 function ProtectedRoute() {
   const { user } = useAuth();
@@ -38,6 +40,8 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/patients" element={<Patients />} />
           <Route path="/doctors" element={<Doctors />} />
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/whatsapp" element={<WhatsApp />} />
 
           <Route element={<AdminRoute />}>
             <Route path="/settings" element={<Settings />} />

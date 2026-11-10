@@ -11,6 +11,17 @@ import {
   Clock3,
   PlusCircle,
   Trash,
+  Phone,
+  GraduationCap,
+  IndianRupee,
+  BriefcaseMedical,
+  Users,
+  CalendarCheck,
+  Filter,
+  CheckCircle2,
+  AlertCircle,
+  ChevronDown,
+  MoreHorizontal,
 } from "lucide-react";
 
 import { demoStore } from "../../data/demoStore";
@@ -44,13 +55,7 @@ const createShift = () => ({
 
 const createWeeklySchedule = () =>
   Object.fromEntries(
-    weekdays.map((day) => [
-      day,
-      {
-        enabled: false,
-        shifts: [],
-      },
-    ]),
+    weekdays.map((day) => [day, { enabled: false, shifts: [] }]),
   );
 
 function normalizeSchedule(existing) {
@@ -58,7 +63,6 @@ function normalizeSchedule(existing) {
 
   if (!existing) return weekly;
 
-  // Support schedules created using the previous schedule format.
   if (existing.weekly) {
     weekdays.forEach((day) => {
       const savedDay = existing.weekly[day];
@@ -114,6 +118,7 @@ function getScheduleSummary(schedule) {
   if (!schedule) return "Not configured";
 
   const weekly = normalizeSchedule(schedule);
+
   const workingDays = weekdays.filter(
     (day) => weekly[day].enabled && weekly[day].shifts.length,
   );
@@ -123,10 +128,22 @@ function getScheduleSummary(schedule) {
   return `${workingDays.length} working days`;
 }
 
+function getInitials(name = "") {
+  return name
+    .replace(/^Dr\.?\s*/i, "")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
+}
+
 export default function Doctors() {
   const [doctors, setDoctors] = useState([]);
   const [schedules, setSchedules] = useState([]);
+
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   const [showModal, setShowModal] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
@@ -153,21 +170,33 @@ export default function Doctors() {
   const filteredDoctors = useMemo(() => {
     const query = search.toLowerCase().trim();
 
-    if (!query) return doctors;
-
-    return doctors.filter((doctor) =>
-      [doctor.id, doctor.name, doctor.specialization, doctor.phone].some(
-        (value) =>
+    return doctors.filter((doctor) => {
+      const matchesSearch =
+        !query ||
+        [
+          doctor.id,
+          doctor.name,
+          doctor.specialization,
+          doctor.phone,
+          doctor.qualification,
+        ].some((value) =>
           String(value || "")
             .toLowerCase()
             .includes(query),
-      ),
-    );
-  }, [doctors, search]);
+        );
+
+      const matchesStatus =
+        statusFilter === "All" || doctor.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [doctors, search, statusFilter]);
 
   const activeCount = doctors.filter(
     (doctor) => doctor.status === "Active",
   ).length;
+
+  const inactiveCount = doctors.length - activeCount;
 
   const scheduledCount = doctors.filter((doctor) => {
     const saved = getSchedule(doctor.id);
@@ -218,10 +247,16 @@ export default function Doctors() {
       return;
     }
 
+    if (Number(form.experience) < 0 || Number(form.consultationFee) < 0) {
+      alert("Experience and consultation fee cannot be negative.");
+      return;
+    }
+
     const payload = {
       ...form,
       name: form.name.trim(),
       specialization: form.specialization.trim(),
+      qualification: form.qualification.trim(),
       experience: Number(form.experience) || 0,
       consultationFee: Number(form.consultationFee) || 0,
     };
@@ -279,18 +314,22 @@ export default function Doctors() {
   };
 
   const toggleDay = (day) => {
-    setWeeklySchedule((previous) => ({
-      ...previous,
-      [day]: {
-        ...previous[day],
-        enabled: !previous[day].enabled,
-        shifts: !previous[day].enabled
-          ? previous[day].shifts.length
-            ? previous[day].shifts
-            : [createShift()]
-          : previous[day].shifts,
-      },
-    }));
+    setWeeklySchedule((previous) => {
+      const enabled = !previous[day].enabled;
+
+      return {
+        ...previous,
+        [day]: {
+          ...previous[day],
+          enabled,
+          shifts: enabled
+            ? previous[day].shifts.length
+              ? previous[day].shifts
+              : [createShift()]
+            : previous[day].shifts,
+        },
+      };
+    });
   };
 
   const addShift = (day) => {
@@ -417,183 +456,271 @@ export default function Doctors() {
 
   return (
     <div className="doctors-page">
-      <div className="doctors-header">
+      {/* PAGE HEADER */}
+      <header className="doctors-header">
         <div>
           <span className="doctors-eyebrow">CLINIC MANAGEMENT</span>
           <h1>Doctors</h1>
-          <p>Manage doctors, consultation fees and weekly availability.</p>
+          <p>Manage your medical team, consultation fees and availability.</p>
         </div>
 
         <button className="doctor-primary-btn" onClick={openAddModal}>
           <Plus size={18} />
           Add Doctor
         </button>
-      </div>
+      </header>
 
-      <div className="doctors-stats">
+      {/* OVERVIEW */}
+      <section className="doctors-stats">
         <div className="doctor-stat-card">
           <div className="doctor-stat-icon blue">
-            <Stethoscope size={21} />
+            <Users size={21} />
           </div>
           <div>
             <span>Total Doctors</span>
             <strong>{doctors.length}</strong>
+            <small>Registered in clinic</small>
           </div>
         </div>
 
         <div className="doctor-stat-card">
           <div className="doctor-stat-icon green">
-            <UserRound size={21} />
+            <CheckCircle2 size={21} />
           </div>
           <div>
             <span>Active Doctors</span>
             <strong>{activeCount}</strong>
+            <small>Currently available</small>
           </div>
         </div>
 
         <div className="doctor-stat-card">
           <div className="doctor-stat-icon purple">
-            <CalendarDays size={21} />
+            <CalendarCheck size={21} />
           </div>
           <div>
-            <span>With Schedules</span>
+            <span>Schedules Configured</span>
             <strong>{scheduledCount}</strong>
+            <small>Out of {doctors.length} doctors</small>
           </div>
         </div>
-      </div>
 
-      <section className="doctors-content">
-        <div className="doctors-toolbar">
+        <div className="doctor-stat-card">
+          <div className="doctor-stat-icon orange">
+            <AlertCircle size={21} />
+          </div>
           <div>
-            <h2>All Doctors</h2>
-            <p>{filteredDoctors.length} doctors found</p>
+            <span>Inactive Doctors</span>
+            <strong>{inactiveCount}</strong>
+            <small>Not accepting appointments</small>
           </div>
-
-          <div className="doctor-search">
-            <Search size={18} />
-            <input
-              placeholder="Search doctors..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="doctors-table-wrapper">
-          <table className="doctors-table">
-            <thead>
-              <tr>
-                <th>Doctor</th>
-                <th>Specialization</th>
-                <th>Experience</th>
-                <th>Consultation Fee</th>
-                <th>Weekly Schedule</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredDoctors.map((doctor) => {
-                const savedSchedule = getSchedule(doctor.id);
-
-                return (
-                  <tr key={doctor.id}>
-                    <td>
-                      <div className="doctor-name-cell">
-                        <div className="doctor-avatar">
-                          {doctor.name
-                            ?.replace("Dr. ", "")
-                            .charAt(0)
-                            .toUpperCase()}
-                        </div>
-
-                        <div>
-                          <strong>{doctor.name}</strong>
-                          <span>{doctor.id}</span>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td>
-                      <div className="doctor-specialization">
-                        {doctor.specialization}
-                        <span>{doctor.qualification}</span>
-                      </div>
-                    </td>
-
-                    <td>{doctor.experience} years</td>
-
-                    <td>
-                      <span className="doctor-fee">
-                        ₹
-                        {Number(doctor.consultationFee || 0).toLocaleString(
-                          "en-IN",
-                        )}
-                      </span>
-                    </td>
-
-                    <td>
-                      <div className="schedule-cell">
-                        <span>{getScheduleSummary(savedSchedule)}</span>
-                        <button
-                          className="doctor-schedule-btn"
-                          onClick={() => openSchedule(doctor)}
-                        >
-                          <CalendarDays size={14} />
-                          {savedSchedule ? "Manage" : "Set schedule"}
-                        </button>
-                      </div>
-                    </td>
-
-                    <td>
-                      <span
-                        className={`doctor-status ${
-                          doctor.status === "Active" ? "active" : "inactive"
-                        }`}
-                      >
-                        {doctor.status}
-                      </span>
-                    </td>
-
-                    <td>
-                      <div className="doctor-actions">
-                        <button
-                          title="Edit doctor"
-                          onClick={() => openEditModal(doctor)}
-                        >
-                          <Pencil size={16} />
-                        </button>
-
-                        <button
-                          title="Delete doctor"
-                          className="delete"
-                          onClick={() => handleDelete(doctor)}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-
-              {filteredDoctors.length === 0 && (
-                <tr>
-                  <td colSpan="7">
-                    <div className="doctors-empty">
-                      <Stethoscope size={32} />
-                      <strong>No doctors found</strong>
-                      <span>Try another search or add a doctor.</span>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
         </div>
       </section>
 
+      {/* DOCTOR DIRECTORY */}
+      <section className="doctors-content">
+        <div className="doctors-toolbar">
+          <div>
+            <h2>Doctor Directory</h2>
+            <p>
+              {filteredDoctors.length} of {doctors.length} doctors
+            </p>
+          </div>
+
+          <div className="doctor-toolbar-actions">
+            <div className="doctor-search">
+              <Search size={17} />
+              <input
+                type="text"
+                placeholder="Search doctors..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  title="Clear search"
+                >
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+
+            <div className="doctor-filter">
+              <Filter size={16} />
+              <select
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+                aria-label="Filter doctors by status"
+              >
+                <option value="All">All doctors</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+              <ChevronDown size={14} />
+            </div>
+          </div>
+        </div>
+
+        {filteredDoctors.length > 0 ? (
+          <div className="doctor-grid">
+            {filteredDoctors.map((doctor) => {
+              const savedSchedule = getSchedule(doctor.id);
+              const hasSchedule =
+                getScheduleSummary(savedSchedule) !== "Not configured";
+
+              return (
+                <article className="doctor-card" key={doctor.id}>
+                  <div className="doctor-card-top">
+                    <div className="doctor-profile">
+                      <div className="doctor-avatar">
+                        {getInitials(doctor.name)}
+                      </div>
+
+                      <div className="doctor-profile-info">
+                        <h3>{doctor.name}</h3>
+                        <span>{doctor.id}</span>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`doctor-status ${
+                        doctor.status === "Active" ? "active" : "inactive"
+                      }`}
+                    >
+                      <span className="doctor-status-dot" />
+                      {doctor.status}
+                    </span>
+                  </div>
+
+                  <div className="doctor-card-specialization">
+                    <BriefcaseMedical size={16} />
+                    <span>{doctor.specialization || "Not specified"}</span>
+                  </div>
+
+                  <div className="doctor-card-details">
+                    <div>
+                      <GraduationCap size={16} />
+                      <span>
+                        {doctor.qualification || "Qualification not added"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <BriefcaseMedical size={16} />
+                      <span>{doctor.experience || 0} years experience</span>
+                    </div>
+
+                    <div>
+                      <Phone size={15} />
+                      <span>{doctor.phone || "Phone not added"}</span>
+                    </div>
+                  </div>
+
+                  <div className="doctor-card-fee">
+                    <div>
+                      <span>Consultation fee</span>
+                      <strong>
+                        <IndianRupee size={16} />
+                        {Number(doctor.consultationFee || 0).toLocaleString(
+                          "en-IN",
+                        )}
+                      </strong>
+                    </div>
+
+                    <div className="doctor-fee-label">Per consultation</div>
+                  </div>
+
+                  <div className="doctor-card-schedule">
+                    <div className="doctor-schedule-info">
+                      <CalendarDays size={17} />
+                      <div>
+                        <strong>
+                          {hasSchedule
+                            ? getScheduleSummary(savedSchedule)
+                            : "Schedule not set"}
+                        </strong>
+                        <span>
+                          {hasSchedule
+                            ? "Weekly availability configured"
+                            : "Set working hours"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="doctor-schedule-btn"
+                      onClick={() => openSchedule(doctor)}
+                    >
+                      {hasSchedule ? "Manage" : "Configure"}
+                    </button>
+                  </div>
+
+                  <div className="doctor-card-actions">
+                    <button
+                      type="button"
+                      className="doctor-edit-btn"
+                      onClick={() => openEditModal(doctor)}
+                    >
+                      <Pencil size={15} />
+                      Edit profile
+                    </button>
+
+                    <button
+                      type="button"
+                      className="doctor-delete-btn"
+                      onClick={() => handleDelete(doctor)}
+                      title="Delete doctor"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="doctors-empty">
+            <div className="doctors-empty-icon">
+              <Stethoscope size={30} />
+            </div>
+
+            <strong>
+              {doctors.length === 0
+                ? "No doctors added yet"
+                : "No matching doctors"}
+            </strong>
+
+            <span>
+              {doctors.length === 0
+                ? "Start by adding doctors to your clinic directory."
+                : "Try changing your search or status filter."}
+            </span>
+
+            {doctors.length === 0 ? (
+              <button className="doctor-primary-btn" onClick={openAddModal}>
+                <Plus size={17} />
+                Add your first doctor
+              </button>
+            ) : (
+              <button
+                className="doctor-cancel-btn"
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("All");
+                }}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* ADD / EDIT DOCTOR MODAL */}
       {showModal && (
         <div
           className="doctor-modal-overlay"
@@ -607,7 +734,12 @@ export default function Doctors() {
             <div className="doctor-modal-header">
               <div>
                 <span className="doctors-eyebrow">DOCTOR MANAGEMENT</span>
-                <h2>{editingId ? "Edit Doctor" : "Add Doctor"}</h2>
+                <h2>{editingId ? "Edit Doctor" : "Add New Doctor"}</h2>
+                <p>
+                  {editingId
+                    ? "Update the doctor's profile information."
+                    : "Add a doctor to your clinic directory."}
+                </p>
               </div>
 
               <button
@@ -620,86 +752,108 @@ export default function Doctors() {
             </div>
 
             <form onSubmit={handleSubmit}>
-              <div className="doctor-form-grid">
-                <label>
-                  Doctor Name *
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="Dr. Full Name"
-                    required
-                  />
-                </label>
+              <div className="doctor-form-section">
+                <div className="doctor-form-section-heading">
+                  <UserRound size={17} />
+                  <div>
+                    <strong>Personal Information</strong>
+                    <span>Basic details of the doctor</span>
+                  </div>
+                </div>
 
-                <label>
-                  Specialization *
-                  <input
-                    name="specialization"
-                    value={form.specialization}
-                    onChange={handleChange}
-                    placeholder="e.g. Cardiology"
-                    required
-                  />
-                </label>
+                <div className="doctor-form-grid">
+                  <label>
+                    Doctor Name *
+                    <input
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      placeholder="e.g. Dr. Rahul Sharma"
+                      required
+                    />
+                  </label>
 
-                <label>
-                  Qualification
-                  <input
-                    name="qualification"
-                    value={form.qualification}
-                    onChange={handleChange}
-                    placeholder="e.g. MBBS, MD"
-                  />
-                </label>
+                  <label>
+                    Phone Number
+                    <input
+                      name="phone"
+                      inputMode="numeric"
+                      maxLength="10"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="10-digit phone number"
+                    />
+                  </label>
+                </div>
+              </div>
 
-                <label>
-                  Experience (years)
-                  <input
-                    type="number"
-                    min="0"
-                    name="experience"
-                    value={form.experience}
-                    onChange={handleChange}
-                    placeholder="e.g. 10"
-                  />
-                </label>
+              <div className="doctor-form-section">
+                <div className="doctor-form-section-heading">
+                  <GraduationCap size={18} />
+                  <div>
+                    <strong>Professional Information</strong>
+                    <span>Specialization and experience</span>
+                  </div>
+                </div>
 
-                <label>
-                  Phone Number
-                  <input
-                    name="phone"
-                    inputMode="numeric"
-                    maxLength="10"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="10-digit phone number"
-                  />
-                </label>
+                <div className="doctor-form-grid">
+                  <label>
+                    Specialization *
+                    <input
+                      name="specialization"
+                      value={form.specialization}
+                      onChange={handleChange}
+                      placeholder="e.g. Cardiology"
+                      required
+                    />
+                  </label>
 
-                <label>
-                  Consultation Fee (₹)
-                  <input
-                    type="number"
-                    min="0"
-                    name="consultationFee"
-                    value={form.consultationFee}
-                    onChange={handleChange}
-                    placeholder="e.g. 500"
-                  />
-                </label>
+                  <label>
+                    Qualification
+                    <input
+                      name="qualification"
+                      value={form.qualification}
+                      onChange={handleChange}
+                      placeholder="e.g. MBBS, MD"
+                    />
+                  </label>
 
-                <label>
-                  Status
-                  <select
-                    name="status"
-                    value={form.status}
-                    onChange={handleChange}
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </label>
+                  <label>
+                    Experience (years)
+                    <input
+                      type="number"
+                      min="0"
+                      name="experience"
+                      value={form.experience}
+                      onChange={handleChange}
+                      placeholder="e.g. 10"
+                    />
+                  </label>
+
+                  <label>
+                    Consultation Fee (₹)
+                    <input
+                      type="number"
+                      min="0"
+                      name="consultationFee"
+                      value={form.consultationFee}
+                      onChange={handleChange}
+                      placeholder="e.g. 500"
+                    />
+                  </label>
+
+                  <label>
+                    Account Status
+                    <select
+                      name="status"
+                      value={form.status}
+                      onChange={handleChange}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </label>
+                </div>
               </div>
 
               <div className="doctor-form-footer">
@@ -720,6 +874,7 @@ export default function Doctors() {
         </div>
       )}
 
+      {/* WEEKLY SCHEDULE MODAL */}
       {showSchedule && selectedDoctor && (
         <div
           className="doctor-modal-overlay schedule-overlay"
@@ -733,7 +888,7 @@ export default function Doctors() {
             <div className="doctor-modal-header">
               <div>
                 <span className="doctors-eyebrow">WEEKLY AVAILABILITY</span>
-                <h2>Doctor Schedule</h2>
+                <h2>Manage Schedule</h2>
                 <p>{selectedDoctor.name}</p>
               </div>
 
@@ -748,12 +903,14 @@ export default function Doctors() {
 
             <form onSubmit={saveSchedule}>
               <div className="schedule-intro">
-                <CalendarDays size={20} />
-                <p>
-                  Set individual working hours for each day. You can add
-                  multiple shifts when a doctor takes a break between
-                  consultations.
-                </p>
+                <CalendarDays size={21} />
+                <div>
+                  <strong>Configure working hours</strong>
+                  <p>
+                    Choose working days, set consultation hours and add multiple
+                    shifts if the doctor takes breaks.
+                  </p>
+                </div>
               </div>
 
               <div className="weekly-schedule-list">
@@ -901,7 +1058,8 @@ export default function Doctors() {
                 </button>
 
                 <button type="submit" className="doctor-primary-btn">
-                  Save Weekly Schedule
+                  <CalendarCheck size={17} />
+                  Save Schedule
                 </button>
               </div>
             </form>

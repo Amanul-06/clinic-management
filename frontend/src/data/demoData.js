@@ -1,15 +1,28 @@
 
-const today = new Date();
-
 const dateOffset = (days) => {
-    const date = new Date(today);
+    const date = new Date();
     date.setDate(date.getDate() + days);
-    return date.toISOString().split("T")[0];
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 };
 
 const createDay = (shifts = []) => ({
     enabled: shifts.length > 0,
     shifts,
+});
+
+const createAppointment = (appointment) => ({
+    ...appointment,
+    originalDate: null,
+    originalTime: null,
+    rescheduledFrom: null,
+    cancellationReason: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
 });
 
 export const demoDoctors = [
@@ -119,7 +132,7 @@ export const demoPatients = [
 ];
 
 export const demoAppointments = [
-    {
+    createAppointment({
         id: "APT001",
         patientId: "PAT001",
         patientName: "Rahul Das",
@@ -131,8 +144,8 @@ export const demoAppointments = [
         type: "Consultation",
         status: "Completed",
         fee: 800,
-    },
-    {
+    }),
+    createAppointment({
         id: "APT002",
         patientId: "PAT002",
         patientName: "Ananya Roy",
@@ -144,8 +157,8 @@ export const demoAppointments = [
         type: "Follow-up",
         status: "Scheduled",
         fee: 600,
-    },
-    {
+    }),
+    createAppointment({
         id: "APT003",
         patientId: "PAT003",
         patientName: "Sourav Ghosh",
@@ -157,8 +170,8 @@ export const demoAppointments = [
         type: "Consultation",
         status: "Scheduled",
         fee: 700,
-    },
-    {
+    }),
+    createAppointment({
         id: "APT004",
         patientId: "PAT004",
         patientName: "Riya Banerjee",
@@ -170,8 +183,8 @@ export const demoAppointments = [
         type: "Consultation",
         status: "Scheduled",
         fee: 500,
-    },
-    {
+    }),
+    createAppointment({
         id: "APT005",
         patientId: "PAT005",
         patientName: "Amit Kumar",
@@ -183,7 +196,7 @@ export const demoAppointments = [
         type: "Consultation",
         status: "Scheduled",
         fee: 500,
-    },
+    }),
 ];
 
 export const demoStaff = [
@@ -318,3 +331,24 @@ export const demoSchedules = [
         },
     },
 ];
+
+/*
+ * Date-specific doctor availability exceptions.
+ *
+ * type:
+ * - leave: Doctor is unavailable during the specified period.
+ * - override: Replace the regular schedule for this date.
+ *
+ * Full-day leave:
+ * startTime and endTime are null.
+ *
+ * Partial-day leave:
+ * Provide startTime and endTime.
+ *
+ * Schedule override:
+ * Provide startTime and endTime for the replacement working period.
+ *
+ * These records are initially empty. They will be managed through
+ * the Doctor Leave Management interface.
+ */
+export const demoDoctorExceptions = [];
