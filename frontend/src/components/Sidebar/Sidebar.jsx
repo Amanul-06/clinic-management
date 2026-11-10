@@ -27,7 +27,7 @@ export default function Sidebar({ open, onClose }) {
     { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { label: "Patients", icon: Users, path: "/patients" },
     { label: "Appointments", icon: CalendarDays, disabled: true },
-    { label: "Doctors", icon: Stethoscope, disabled: true },
+    { label: "Doctors", icon: Stethoscope, path: "/doctors" },
     { label: "Visit Records", icon: ClipboardList, disabled: true },
     ...(isAdmin
       ? [

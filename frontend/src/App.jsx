@@ -7,6 +7,7 @@ import DashboardLayout from "./layouts/DashboardLayout/DashboardLayout";
 const Login = lazy(() => import("./pages/Login/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
 const Patients = lazy(() => import("./pages/Patients/Patients"));
+const Doctors = lazy(() => import("./pages/Doctors/Doctors"));
 const Settings = lazy(() => import("./pages/Settings/Settings"));
 
 function ProtectedRoute() {
@@ -36,6 +37,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/patients" element={<Patients />} />
+          <Route path="/doctors" element={<Doctors />} />
 
           <Route element={<AdminRoute />}>
             <Route path="/settings" element={<Settings />} />

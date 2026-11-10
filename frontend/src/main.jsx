@@ -14,11 +14,11 @@ import "./styles/shared.css";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <BrandingProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <BrandingProvider>
           <App />
-        </AuthProvider>
-      </BrandingProvider>
+        </BrandingProvider>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,
 );
