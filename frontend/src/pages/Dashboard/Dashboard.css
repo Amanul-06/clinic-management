@@ -1,0 +1,176 @@
+
+
+.date-display {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #60718c;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.85fr);
+  gap: 19px;
+  margin-bottom: 20px;
+}
+
+.appointments-panel {
+  overflow: hidden;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 21px 21px 18px;
+  gap: 12px;
+}
+
+.panel-heading h3 {
+  margin: 0 0 6px;
+  color: #233653;
+  font-size: 14px;
+}
+
+.quick-actions h3 {
+  margin: 0 0 6px;
+  color: #233653;
+  font-size: 14px;
+}
+
+.panel-heading p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.quick-actions p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.status-pill {
+  padding: 5px 8px;
+  display: inline-block;
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.status-pill.scheduled {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.status-pill.checked-in {
+  color: #a16207;
+  background: #fef9c3;
+}
+
+.status-pill.in-progress {
+  color: #7c3aed;
+  background: #f3e8ff;
+}
+
+.status-pill.completed {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.chart-panel {
+  padding-bottom: 15px;
+}
+
+.chart-period {
+  font-size: 10px;
+  background: #f1f6ff;
+  color: #2563eb;
+  border-radius: 6px;
+  padding: 7px 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.chart-summary {
+  padding: 8px 22px;
+}
+
+.chart-summary h2 {
+  margin: 0 0 4px;
+  font-size: 27px;
+  font-family: "Manrope", sans-serif;
+}
+
+.chart-summary span {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.chart-container {
+  height: 195px;
+  padding: 13px 10px 0 0;
+}
+
+.quick-actions {
+  padding: 21px;
+}
+
+.quick-action-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.quick-action-list button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fafcff;
+  border: 1px solid #e9eef6;
+  border-radius: 8px;
+  padding: 9px 13px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.quick-action-list button span {
+  width: 31px;
+  height: 31px;
+  background: #edf4ff;
+  color: #2563eb;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+}
+
+@media (max-width: 1200px) {
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .date-display {
+    font-size: 10px;
+  }
+
+  .panel-heading {
+    padding: 17px;
+  }
+
+  .quick-action-list {
+    display: grid;
+  }
+}

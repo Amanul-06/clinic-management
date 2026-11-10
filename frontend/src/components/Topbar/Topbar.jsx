@@ -1,5 +1,6 @@
+import "./Topbar.css";
 import { Bell, Menu, Search } from "lucide-react";
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "../../context/useAuth";
 
 export default function Topbar({ onMenuClick }) {
   const { user } = useAuth();

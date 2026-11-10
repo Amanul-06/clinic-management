@@ -1,3 +1,4 @@
+import "./Patients.css";
 import { useEffect, useMemo, useState } from "react";
 import {
   Search,

@@ -1,6 +1,7 @@
+import "./Settings.css";
 import { useRef, useState } from "react";
 import { Building2, ImagePlus, Save, Upload, X } from "lucide-react";
-import { useBranding } from "../context/useBranding";
+import { useBranding } from "../../context/useBranding";
 
 export default function Settings() {
   const { branding, updateBranding } = useBranding();

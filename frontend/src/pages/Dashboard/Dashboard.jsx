@@ -1,3 +1,4 @@
+import "./Dashboard.css";
 import {
   Activity,
   CalendarCheck,
@@ -19,9 +20,9 @@ import {
   CartesianGrid,
 } from "recharts";
 
-import StatCard from "../components/StatCard";
-import { useAuth } from "../context/useAuth";
-import { useBranding } from "../context/useBranding";
+import StatCard from "../../components/StatCard/StatCard";
+import { useAuth } from "../../context/useAuth";
+import { useBranding } from "../../context/useBranding";
 
 const appointments = [
   {

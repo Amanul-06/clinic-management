@@ -1,0 +1,30 @@
+
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+}
+
+.main-area {
+  margin-left: 258px;
+  width: calc(100% - 258px);
+  min-width: 0;
+}
+
+.page-container {
+  padding: 34px;
+  max-width: 1800px;
+  margin: auto;
+}
+
+@media (max-width: 850px) {
+
+  .main-area {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .page-container {
+    padding: 25px 20px;
+  }
+}

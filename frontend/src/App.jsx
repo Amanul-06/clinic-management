@@ -1,12 +1,13 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Patients from "./pages/Patients";
-import Settings from "./pages/Settings";
-import DashboardLayout from "./layouts/DashboardLayout";
-
 import { useAuth } from "./context/useAuth";
+import DashboardLayout from "./layouts/DashboardLayout/DashboardLayout";
+
+const Login = lazy(() => import("./pages/Login/Login"));
+const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
+const Patients = lazy(() => import("./pages/Patients/Patients"));
+const Settings = lazy(() => import("./pages/Settings/Settings"));
 
 function ProtectedRoute() {
   const { user } = useAuth();
@@ -28,20 +29,22 @@ function AdminRoute() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
+    <Suspense fallback={<div className="route-loading">Loading...</div>}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/patients" element={<Patients />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/patients" element={<Patients />} />
 
-        <Route element={<AdminRoute />}>
-          <Route path="/settings" element={<Settings />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/settings" element={<Settings />} />
+          </Route>
         </Route>
-      </Route>
 
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Suspense>
   );
 }

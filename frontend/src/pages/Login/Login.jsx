@@ -1,3 +1,4 @@
+import "./Login.css";
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
@@ -11,8 +12,8 @@ import {
   Users,
 } from "lucide-react";
 
-import { useAuth } from "../context/useAuth";
-import { useBranding } from "../context/useBranding";
+import { useAuth } from "../../context/useAuth";
+import { useBranding } from "../../context/useBranding";
 
 export default function Login() {
   const { user, login } = useAuth();

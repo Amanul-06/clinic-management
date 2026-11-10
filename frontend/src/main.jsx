@@ -6,7 +6,10 @@ import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import { BrandingProvider } from "./context/BrandingContext";
 
-import "./styles/global.css";
+import "./styles/tokens.css";
+import "./styles/reset.css";
+import "./styles/typography.css";
+import "./styles/shared.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
